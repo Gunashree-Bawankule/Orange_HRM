@@ -1,0 +1,8 @@
+Feature: OrangeHRM Login functionality # features/login.feature:2
+
+  Scenario Outline: User fails to log into OrangeHRM with invalid credentials -- @1.1   # features/login.feature:21
+    Given user is on the login page                                                     # features/steps/login_steps.py:8
+    When the user enters invalid Sales and sales123                                     # features/steps/login_steps.py:40
+    And user click on the login button                                                  # features/steps/login_steps.py:26
+    Then the user should see an error message                                           # features/steps/login_steps.py:35
+
