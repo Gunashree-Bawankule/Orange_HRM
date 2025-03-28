@@ -1,32 +1,43 @@
-#from behave import fixture, use_fixture
+from behave import *
 from playwright.sync_api import sync_playwright
-#
-# @fixture
-# def browser():
-#     with sync_playwright() as p:
-#         browser = p.chromium.launch(headless=False)
-#         yield browser
-#         browser.close()
+from behave import use_fixture
+import os
+from dotenv import load_dotenv
+import allure
+
+load_dotenv()
+
 
 def before_all(context):
+    context.browser = os.getenv("BROWSER", "chrome")
+    context.url = os.getenv(
+        "URL", "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login"
+    )
+    print(context.url, context.browser)
 
-    # context.browser = sync_playwright().chromium.launch(headless=False)
-    # context.page = context.browser.new_page()
 
-    context.playwright = sync_playwright().start()
-    context.browser = context.playwright.chromium.launch(headless=False)
-    context.page=context.browser.new_page()
-    # context.enter_credentials(context.username, context.password)
+def setup_browser(context, playwright):
+    if context.browser == "chrome":
+        browser = playwright.chromium.launch(headless=False, slow_mo=200)
+    else:
+        raise ValueError("Unknown browser type")
 
+    context.browser_context = browser.new_context(
+        ignore_https_errors=True,
+    )
+    context.page = context.browser_context.new_page()
+    return browser
+
+
+@fixture
+def setup_playwright(context):
+    playwright = sync_playwright().start()
+    browser = setup_browser(context, playwright)
+    yield context.page
+    browser.close()
+    playwright.stop()
 
 
 def before_scenario(context, scenario):
-    pass
-
-def after_scenario(context, scenario):
-    context.page.close()
-    pass
-
-def after_all(context):
-    context.page.close()
-    pass
+    use_fixture(setup_playwright, context)
+    context.page.goto(context.url)

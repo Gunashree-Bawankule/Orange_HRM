@@ -1,2 +1,28 @@
 playwright~=1.50.0
 behave~=1.2.6
+reformat-gherkin==3.0.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Selector - A String that identifies an element on the page.
+#"a[href='login']"
+#immediately evaluated when used
+#good for the quick scripts or single-use
+
+
+
+#Locator  - An object that encapsulates a selector and adds behavior like auto-waiting,.
+#page.locator("a[href='/login'])"
+#Lazily evaluated - only when the action like .click() or .fill() happens.
+#Preferred for scalable , readable , and maintainable code.

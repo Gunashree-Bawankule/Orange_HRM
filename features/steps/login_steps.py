@@ -1,47 +1,41 @@
-from behave import *
+from behave import given, when, then
 from playwright.sync_api import expect
-
-#from playwright.sync_api import sync_playwright
 from pages.login_page import LoginPage
 
 
 @given("user is on the login page")
-def step_impl(context):
-    # context.playwright = sync_playwright().start()
-    # context.browser = context.playwright.chromium.launch(headless=False)
-    # context.page=context.browser.new_page()
+def open_login_page(context):
     context.login_page = LoginPage(context.page)
-    context.login_page.navigate()
+    context.login_page.navigate_to_login_page()
+    context.page.goto("https://opensource-demo.orangehrmlive.com/")
+
 
 @when("user enter valid {username} and {password}")
-def step_impl(context, username, password):
-    """
-    :type context: behave.runner.Context
-    :type username: str
-    :type password: str
-    """
+def enter_valid_credentials(context, username, password):
     context.login_page.enter_credentials(username, password)
 
 
+@when("the user enters invalid {invalid_username} and {invalid_password}")
+def enter_credentials(context, invalid_username, invalid_password):
+    print(f"Invalid Username: {invalid_username}, Invalid Password: {invalid_password}")
+    context.login_page.enter_credentials(invalid_username, invalid_password)
+
+
 @when("user click on the login button")
-def step_impl(context):
-      context.login_page.click_login_button()
-      context.page.wait_for_timeout(5000)
+def click_login_button(context):
+    context.login_page.click_login_button()
+    context.page.wait_for_timeout(5000)
+
 
 @then("user should be redirected to the dashboard")
-def step_impl(context):
-    assert context.page.url == "https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index"
+def verify_dashboard(context):
+    current_url = context.login_page.url
+    assert (
+        current_url
+        == "https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index"
+    )
+
 
 @then("the user should see an error message")
-def step_impl(context):
-    expect(context.page.get_by_text('Invalid credentials')).to_be_visible()
-
-
-@When("the user enters invalid {invalid_username} and {invalid_password}")
-def step_impl(context, invalid_username, invalid_password):
-    """
-    :type context: behave.runner.Context
-    :type invalid_username: str
-    :type invalid_password: str
-    """
-    context.login_page.enter_credentials(invalid_username, invalid_password)
+def error_message(context):
+    expect(context.login_page.get_by_text("Invalid credentials")).to_be_visible()

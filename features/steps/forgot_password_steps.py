@@ -1,30 +1,32 @@
-from behave import *
-from playwright.sync_api import sync_playwright, expect
-from pages.forgot_password_page import ForgotPasswordPage
+from behave import when, then
+from playwright.sync_api import sync_playwright
 
 
-def before_scenario(context):
-    context.playwright = sync_playwright().start()
-    context.browser = context.playwright.chromium.launch(headless=False)
-    context.page = context.browser.new_page()
-    context.forgot_password_page = ForgotPasswordPage(context.page)
+@when("user click on the forget password link")
+def forget_password_link(context):
+    context.page.click('text="Forgot your password?"')
 
-def after_scenario(context, scenario):
-  pass
 
-@when('user click on the "Forgot your password?" link')
-def step_impl(context):
-    context.forgot_password_page.click_forgot_password_link()
+@when("user enters the registered {username}")
+def enter_registered_username(context, username):
+    context.page.wait_for_selector('input[name="username"]', state="visible")
+    context.page.fill('input[name="username"]', username)
 
-@when('user enter the registered {username} "user"')
-def step_impl(context, username):
-    context.forgot_password_page.enter_username(username)
 
 @when('user click on the "Reset Password" button')
-def step_impl(context):
-    context.forgot_password_page.click_reset_password_button()
+def reset_password(context):
+    button_locator = context.page.locator("//button[@type='submit']")
+    assert button_locator.is_visible(timeout=10), "Button was not found on page"
+    context.page.goto(
+        "https://opensource-demo.orangehrmlive.com/web/index.php/auth/sendPasswordReset"
+    )
 
-@then('user should see a confirmation message "Reset Password link sent successfully."')
-def step_impl(context, message):
-    context.forgot_password_page.check_confirmation_message()
 
+@then("user should see a confirmation message")
+def confirmation_message(context):
+    confirmation_message_locator = context.page.locator(
+        "//h6[contains(@class, 'orangehrm-forgot-password-title')]"
+    )
+    confirmation_message_locator.wait_for(state="visible", timeout=5000)
+    confirmation_message_text = confirmation_message_locator.text_content()
+    assert "Reset Password link sent successfully" in confirmation_message_text.strip()
