@@ -36,5 +36,3 @@ class LoginPage(Page):
 
     # def click_forget_password_link(self):
     #     self.forgot_password_link.click()
-
-

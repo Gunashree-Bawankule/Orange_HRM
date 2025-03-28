@@ -17,7 +17,7 @@ repos:
         args:
           - "--max-line-length=1000"
           - "--extend-ignore=E501,E712,E302,E128,F405,W391,F541,F401,F403,F811,E231,E722"
-  - repo: https://github.com/ducminh-phan/reformat-gherkin
-    rev: v3.0.1
-    hooks:
-      - id: reformat-gherkin
+#  - repo: https://github.com/ducminh-phan/reformat-gherkin
+#    rev: v3.0.1
+#    hooks:
+#      - id: reformat-gherkin
