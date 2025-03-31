@@ -3,5 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$USER_HOME$/Desktop" vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Orange_HRM" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/PythonProject" vcs="Git" />
   </component>
 </project>

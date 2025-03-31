@@ -1,0 +1,5 @@
+.venv/
+allure-2.13.8.tgz
+allure-2.13.8/
+allure-report/
+reports/
