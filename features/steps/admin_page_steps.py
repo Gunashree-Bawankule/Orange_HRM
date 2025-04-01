@@ -24,7 +24,6 @@ def navigates_to_admin_page(context):
 @when('user added a new user with {employee_name} "John Doe" {user_role} "admin"')
 def step_impl(context, employee_name, user_role):
     result = context.admin_page.enter_credentials(employee_name, user_role)
-    # context.page.locator("//input[@placeholder='Type for hints...']").fill('John Doe'+str(randomNumber))
     context.page.wait_for_timeout(2000)
     context.page.keyboard.press("ArrowDown+Enter")
     randomNumber = randint(11111, 99999)
