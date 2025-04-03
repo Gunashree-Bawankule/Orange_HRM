@@ -1,43 +1,34 @@
-from behave import *
 from playwright.sync_api import sync_playwright
-from behave import use_fixture
-import os
-from dotenv import load_dotenv
 import allure
-
-load_dotenv()
 
 
 def before_all(context):
-    context.browser = os.getenv("BROWSER", "chrome")
-    context.url = os.getenv(
-        "URL", "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login"
+    context.playwright = sync_playwright().start()
+    context.browser = context.playwright.chromium.launch(
+        headless=False, args=["--start-maximized"], slow_mo=500
     )
-    print(context.url, context.browser)
-
-
-def setup_browser(context, playwright):
-    if context.browser == "chrome":
-        browser = playwright.chromium.launch(headless=False, slow_mo=200)
-    else:
-        raise ValueError("Unknown browser type")
-
-    context.browser_context = browser.new_context(
-        ignore_https_errors=True,
-    )
-    context.page = context.browser_context.new_page()
-    return browser
-
-
-@fixture
-def setup_playwright(context):
-    playwright = sync_playwright().start()
-    browser = setup_browser(context, playwright)
-    yield context.page
-    browser.close()
-    playwright.stop()
 
 
 def before_scenario(context, scenario):
-    use_fixture(setup_playwright, context)
-    context.page.goto(context.url)
+    context.ctx = context.browser.new_context(
+        no_viewport=True, record_video_dir="reports/video"
+    )
+    context.page = context.ctx.new_page()
+
+
+def after_scenario(context, scenario):
+    context.page.wait_for_timeout(30000)
+    context.page.close()
+    path = context.page.video.path()
+    allure.attach.file(path, name=f"Video", attachment_type=allure.attachment_type.MP4)
+    context.ctx.close()
+
+
+def after_all(context):
+    context.browser.close()
+    context.playwright.stop()
+
+def after_step(context, step):
+    if step.status != "failed":
+        screenshot=context.page.screenshot(full_page=True)
+        allure.attach(screenshot, name="screenshot",attachment_type=allure.attachment_type.PNG)
